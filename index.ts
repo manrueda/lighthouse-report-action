@@ -16,21 +16,53 @@ interface Score {
   score: number;
 }
 
-async function calculateScore(fullPath: string): Promise<Report | null> {
-  const textContent = await (await promises.readFile(fullPath)).toString('utf8');
-  const report = JSON.parse(textContent);
-  if (report.categories) {
-    const scores = Object.values(report.categories).map((category: any) => ({
-      name: category.title,
-      score: Math.round(category.score * 100)
-    }));
-    return {
-      url: report.finalUrl,
-      scores
-    };
-  } else {
-    return null;
+function getScoreFromReport(report: any): Score[] {
+  // Extract each score from a report into a known format
+  return Object.values(report.categories).map((category: any) => ({
+    name: category.title,
+    score: Math.round(category.score * 100)
+  }))
+}
+
+async function mergeReports(paths: string[]): Promise<Report[]> {
+  // Read all reports from the FS
+  const rawReports = await Promise.all(
+    paths.map(async p => JSON.parse((await promises.readFile(p)).toString('utf8')))
+  )
+  const results = new Map<string, Report>();
+  for (const rawReport of rawReports) {
+    // Ignore reports that does not have categories information
+    if (rawReport.categories) {
+      if (results.has(rawReport.finalUrl)) {
+        // If the same URL was already reported, merge the scores
+        const base = results.get(rawReport.finalUrl)!;
+        const partials: Score[] = getScoreFromReport(rawReport);
+
+        for (const partial of partials) {
+          // Iterate each individual score inside the report and merge the results
+          const baseScore = base.scores.find(s => s.name === partial.name);
+          if (baseScore) {
+            const newScore: Score = {
+              name: baseScore.name,
+              score: (baseScore.score + partial.score) / 2
+            }
+            base.scores.splice(base.scores.indexOf(baseScore), 1, newScore);
+          } else {
+            base.scores.push(partial);
+          }
+        }
+        results.set(rawReport.finalUrl, base);
+
+      } else {
+        // Adds the report to the result Map
+        results.set(rawReport.finalUrl, {
+          url: rawReport.finalUrl,
+          scores: getScoreFromReport(rawReport)
+        })
+      }
+    }
   }
+  return Array.from(results.values())
 }
 
 function composeSummary(first: Report, others: Report[]) {
@@ -50,7 +82,7 @@ async function run() {
 
   const paths = await glob(join(reportsPath, '*.json'));
 
-  const scores = await Promise.all(paths.map(async (reportPath) => calculateScore(reportPath)));
+  const scores = await mergeReports(paths);
 
   const [first, ...others] = scores.filter(s => s !== null) as Report[];
 
