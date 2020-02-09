@@ -1,0 +1,21 @@
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test report action
+    steps:
+      # To use this repository's private action, you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Audit URLs using Lighthouse
+        uses: treosh/lighthouse-ci-action@v2
+        with:
+          urls: |
+            https://github.com/
+            https://duckduckgo.com/
+      - name: Displays Lighthouse report result as annotations
+        uses: ./ # Uses an action in the root directory
+        with:
+          reports: '.lighthouseci'
+          github-token: ${{ secrets.GITHUB_TOKEN }}

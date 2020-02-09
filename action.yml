@@ -1,0 +1,15 @@
+name: 'Lighthouse Report'
+description: 'Displays Lighthouse report result as annotations'
+branding:
+  icon: 'award'
+  color: 'green'
+inputs:
+  reports:
+    description: 'Directory where lighthouse JSON reports are stored'
+    required: true
+  github-token:
+    description: 'Github Token'
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
