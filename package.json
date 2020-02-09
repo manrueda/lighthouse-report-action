@@ -1,7 +1,7 @@
 {
   "name": "lighthouse-report-action",
   "version": "1.0.0",
-  "description": "GitHub action to display Lighthouse report result as annotations",
+  "description": "GitHub action to display Lighthouse report result as a Run Check",
   "main": "dist/index.js",
   "scripts": {
     "build": "ncc build index.ts"

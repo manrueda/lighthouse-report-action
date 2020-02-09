@@ -1,5 +1,5 @@
 name: 'Lighthouse Report'
-description: 'Displays Lighthouse report result as annotations'
+description: 'Displays Lighthouse report result as a Run Check'
 branding:
   icon: 'award'
   color: 'green'
