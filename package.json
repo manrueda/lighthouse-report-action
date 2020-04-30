@@ -1,6 +1,6 @@
 {
   "name": "lighthouse-report-action",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "GitHub action to display Lighthouse report result as a Run Check",
   "main": "dist/index.js",
   "scripts": {
