@@ -17,6 +17,7 @@ jobs:
             https://web.dev/measure/
       - name: Lighthouse Report
         uses: ./ # Uses an action in the root directory
+        if: always()
         with:
           reports: '.lighthouseci'
           github-token: ${{ secrets.GITHUB_TOKEN }}
