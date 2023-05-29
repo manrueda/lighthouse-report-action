@@ -13,7 +13,7 @@ jobs:
         with:
           runs: 3
           urls: |
-            https://developer.chrome.com/docs/lighthouse/overview/
+            https://www.google.com
       - name: Lighthouse Report
         uses: ./ # Uses an action in the root directory
         with:
